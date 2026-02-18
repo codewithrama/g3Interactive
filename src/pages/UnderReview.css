@@ -1,0 +1,34 @@
+.under-review-container {
+  min-height: 100vh;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.under-review-content {
+  text-align: center;
+  max-width: 500px;
+}
+
+.under-review-icon {
+  color: #667eea;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.under-review-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 12px;
+}
+
+.under-review-message {
+  font-size: 16px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.6;
+}

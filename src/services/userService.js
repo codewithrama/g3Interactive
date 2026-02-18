@@ -1,5 +1,8 @@
-// Mock user data service
-let users = [
+import { getStorage, safeJsonParse } from '../utils/storage'
+
+const USERS_KEY = 'g3_users_v1'
+
+const defaultUsers = [
   {
     id: 1,
     name: 'Travis Scott',
@@ -184,7 +187,22 @@ let users = [
   },
 ]
 
-let nextId = 16
+function loadUsers() {
+  const storage = getStorage()
+  if (!storage) return [...defaultUsers]
+  const parsed = safeJsonParse(storage.getItem(USERS_KEY), null)
+  if (!Array.isArray(parsed) || parsed.length === 0) return [...defaultUsers]
+  return parsed
+}
+
+function persistUsers(next) {
+  const storage = getStorage()
+  if (!storage) return
+  storage.setItem(USERS_KEY, JSON.stringify(next))
+}
+
+let users = loadUsers()
+let nextId = Math.max(0, ...users.map((u) => Number(u.id) || 0)) + 1
 
 export const userService = {
   async getUsers(page = 1, pageSize = 10, search = '', statusFilter = '') {
@@ -234,6 +252,7 @@ export const userService = {
       status: userData.status || 'Active',
     }
     users.push(newUser)
+    persistUsers(users)
     return newUser
   },
 
@@ -242,6 +261,7 @@ export const userService = {
     const index = users.findIndex((u) => u.id === parseInt(id))
     if (index === -1) throw new Error('User not found')
     users[index] = { ...users[index], ...userData }
+    persistUsers(users)
     return users[index]
   },
 
@@ -250,6 +270,7 @@ export const userService = {
     const index = users.findIndex((u) => u.id === parseInt(id))
     if (index === -1) throw new Error('User not found')
     users.splice(index, 1)
+    persistUsers(users)
     return true
   },
 
@@ -258,6 +279,7 @@ export const userService = {
     const user = users.find((u) => u.id === parseInt(id))
     if (!user) throw new Error('User not found')
     user.status = user.status === 'Active' ? 'Inactive' : 'Active'
+    persistUsers(users)
     return user
   },
 }

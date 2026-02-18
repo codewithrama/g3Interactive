@@ -1,5 +1,6 @@
-import { useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getAuth, setAuth } from "../utils/auth";
 import "./Login.css";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -39,6 +40,11 @@ export default function Login() {
   const showErrors = submittedOnce;
   const isFormValid = email.trim() && password && !hasErrors;
 
+  useEffect(() => {
+    const existing = getAuth();
+    if (existing?.email) navigate("/users");
+  }, [navigate]);
+
   async function onSubmit(e) {
     e.preventDefault();
     setSubmittedOnce(true);
@@ -65,6 +71,12 @@ export default function Login() {
         setIsSubmitting(false);
         return;
       }
+
+      setAuth({
+        email: email.trim().toLowerCase(),
+        remember,
+        loginAt: Date.now(),
+      });
 
       setStatus({
         type: "success",
